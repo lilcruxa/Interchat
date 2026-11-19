@@ -229,6 +229,7 @@ document.getElementById("login").addEventListener("click", async () => {
       passwordInput.value
     );
     message.textContent = "Welcome back to INTERCHAT!";
+    document.getElementById("auth-section").style.display = "none";
   } catch (error) {
     message.textContent = error.message;
   }
