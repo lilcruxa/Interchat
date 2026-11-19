@@ -200,8 +200,11 @@ console.log("INTERCHAT Firebase initialized!");
 </div>
 
 <script type="module">
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword }
-from "https://www.gstatic.com/firebasejs/13.4.0/firebase-auth.js";
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/13.4.0/firebase-auth.js";
 
 import {
   doc, setDoc, serverTimestamp,
@@ -211,7 +214,15 @@ import {
 const emailInput = document.getElementById("email");
 const passwordInput = document.getElementById("password");
 const message = document.getElementById("auth-message");
-
+onAuthStateChanged(window.auth, (user) => {
+  if (user) {
+    document.getElementById("auth-section").style.display = "none";
+    document.getElementById("app-screen").style.display = "block";
+  } else {
+    document.getElementById("auth-section").style.display = "block";
+    document.getElementById("app-screen").style.display = "none";
+  }
+});
 document.getElementById("signup").addEventListener("click", async () => {
   const email = emailInput.value.trim();
   const password = passwordInput.value;
