@@ -1,0 +1,235 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>INTERCHAT</title>
+
+<style>
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: #09090f;
+  color: white;
+  font-family: Arial, sans-serif;
+  padding-bottom: 75px;
+}
+
+header {
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #252535;
+}
+
+.logo {
+  font-size: 25px;
+  font-weight: bold;
+  color: #9b7bff;
+}
+
+.search {
+  margin: 15px;
+  padding: 13px;
+  background: #191923;
+  border-radius: 12px;
+  color: #aaa;
+}
+
+.stories {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  padding: 15px;
+}
+
+.story {
+  min-width: 65px;
+  text-align: center;
+  font-size: 12px;
+}
+
+.circle {
+  width: 55px;
+  height: 55px;
+  border-radius: 50%;
+  border: 2px solid #9b7bff;
+  margin: auto auto 7px;
+  background: #242438;
+  display: grid;
+  place-items: center;
+  font-size: 22px;
+}
+
+.post {
+  margin: 15px;
+  padding: 15px;
+  background: #191923;
+  border-radius: 14px;
+}
+
+.post h3 {
+  margin-bottom: 10px;
+}
+
+.post p {
+  color: #ccc;
+  line-height: 1.5;
+}
+
+nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #15151f;
+  display: flex;
+  justify-content: space-around;
+  padding: 16px 5px;
+  border-top: 1px solid #29293a;
+}
+
+nav span {
+  color: #aaa;
+  font-size: 12px;
+}
+
+nav .active {
+  color: #a88aff;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="logo">INTERCHAT</div>
+  <div>🔔</div>
+</header>
+
+<div class="search">🔍 Search INTERCHAT...</div>
+
+<div class="stories">
+  <div class="story">
+    <div class="circle">+</div>
+    Your story
+  </div>
+  <div class="story">
+    <div class="circle">👤</div>
+    Alex
+  </div>
+  <div class="story">
+    <div class="circle">👤</div>
+    Sarah
+  </div>
+  <div class="story">
+    <div class="circle">👤</div>
+    John
+  </div>
+</div>
+
+<div class="post">
+  <h3>Welcome to INTERCHAT 🌍</h3>
+  <p>Your world. Your people. Your conversation. Connect with the world on INTERCHAT!</p>
+</div>
+
+<nav>
+  <span class="active">⌂ Home</span>
+  <span>🔍 Explore</span>
+  <span>＋ Post</span>
+  <span>💬 Chats</span>
+  <span>👤 Profile</span>
+</nav>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-app.js";
+import { getAuth } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-auth.js";
+import { getFirestore } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDjKlQjHuzQgDIqOHF_0fLJuqfL9701cJc",
+  authDomain: "interchat-c1cfc.firebaseapp.com",
+  projectId: "interchat-c1cfc",
+  storageBucket: "interchat-c1cfc.firebasestorage.app",
+  messagingSenderId: "583165274280",
+  appId: "1:583165274280:web:cab44e35230adc157a7a9d"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+console.log("INTERCHAT Firebase initialized!");
+</script>
+
+</body>
+<div id="auth-section" style="padding:20px; background:#111827; color:white; border-radius:12px; margin:20px;">
+  <h2>Welcome to INTERCHAT</h2>
+  <p>Create your account or sign in.</p>
+
+  <input id="email" type="email" placeholder="Email address"
+    style="width:100%;padding:12px;margin:8px 0;">
+
+  <input id="password" type="password" placeholder="Password"
+    style="width:100%;padding:12px;margin:8px 0;">
+
+  <button id="signup" style="padding:12px;width:100%;margin:6px 0;">
+    Create Account
+  </button>
+
+  <button id="login" style="padding:12px;width:100%;margin:6px 0;">
+    Sign In
+  </button>
+
+  <p id="auth-message"></p>
+</div>
+
+<script type="module">
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword }
+from "https://www.gstatic.com/firebasejs/13.4.0/firebase-auth.js";
+
+import { doc, setDoc, serverTimestamp }
+from "https://www.gstatic.com/firebasejs/13.4.0/firebase-firestore.js";
+
+const emailInput = document.getElementById("email");
+const passwordInput = document.getElementById("password");
+const message = document.getElementById("auth-message");
+
+document.getElementById("signup").addEventListener("click", async () => {
+  const email = emailInput.value.trim();
+  const password = passwordInput.value;
+
+  try {
+    const result = await createUserWithEmailAndPassword(auth, email, password);
+
+    await setDoc(doc(db, "users", result.user.uid), {
+      email: result.user.email,
+      username: email.split("@")[0],
+      createdAt: serverTimestamp()
+    });
+
+    message.textContent = "Account created successfully!";
+  } catch (error) {
+    message.textContent = error.message;
+  }
+});
+
+document.getElementById("login").addEventListener("click", async () => {
+  try {
+    await signInWithEmailAndPassword(
+      auth,
+      emailInput.value.trim(),
+      passwordInput.value
+    );
+    message.textContent = "Welcome back to INTERCHAT!";
+  } catch (error) {
+    message.textContent = error.message;
+  }
+});
+</script></html>
