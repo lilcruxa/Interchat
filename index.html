@@ -145,10 +145,13 @@ nav .active {
 </div>
 
 <div   class="post">
-  <h3>Welcome to INTERCHAT 🌍</h3>
+  <h3> welcome to INTERCHAT 🌍</h3>
   <p>Your world. Your people. Your conversation. Connect with the world on INTERCHAT!</p>
+</div><div id="feed-list"></div>
+<div class="create-post">
+  <textarea id="post-content" placeholder="What's happening?"></textarea>
+  <button onclick="createPost()">Post</button>
 </div>
-
 <nav>
   <span class="active">⌂ Home</span>
   <span>🔍 Explore</span>
@@ -179,7 +182,7 @@ window.db = db;
 console.log("INTERCHAT Firebase initialized!");
 </script>
 <div id="auth-section" style="padding:20px; background:#111827; color:white; border-radius:12px; margin:20px;">
-  <h2>Welcome to INTERCHAT</h2>
+  <h2>e to INTERCHAT</h2>
   <p>Create your account or sign in.</p>
 
   <input id="email" type="email" placeholder="Email address"
@@ -251,7 +254,7 @@ document.getElementById("login").addEventListener("click", async () => {
       emailInput.value.trim(),
       passwordInput.value
     );
-    message.textContent = "Welcome back to INTERCHAT!";
+    message.textContent = "e back to INTERCHAT!";
     document.getElementById("auth-section").style.display = "none";
     document.getElementById("app-screen").style.display = "block";
   } catch (error) {
@@ -289,5 +292,52 @@ document.getElementById("publish-post").addEventListener("click", async () => {
     postMessage.textContent = error.message;
   }
 });
+async function createPost() {
+  const content = document.getElementById("post-content").value.trim();
 
-</script></body></html>
+  if (!content) {
+    alert("Please write something first!");
+    return;
+  }
+
+  try {
+    const user = auth.currentUser;
+
+    if (!user) {
+      alert("Please log in first.");
+      return;
+    }
+
+    await addDoc(collection(db, "posts"), {
+      content: content,
+      userId: user.uid,
+      createdAt: new Date()
+    });
+
+    document.getElementById("post-content").value = "";
+    alert("Post published successfully!");
+  } catch (error) {
+    alert(error.message);
+  }
+  }
+  onSnapshot(collection(db, "posts"), (snapshot) => {
+  const feed = document.getElementById("feed-list");
+
+  feed.innerHTML = "";
+
+  snapshot.forEach((doc) => {
+    const post = doc.data();
+
+    const postElement = document.createElement("div");
+    postElement.className = "post-card";
+
+    const content = document.createElement("p");
+    content.textContent = post.content;
+
+    postElement.appendChild(content);
+    feed.appendChild(postElement);
+  });
+});
+</script>
+</body>
+</html>
