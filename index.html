@@ -106,8 +106,8 @@ nav .active {
 </style>
 </head>
 
-<bod>
-
+<body>
+<div id="app-screen" style="display:none;">
 <header>
   <div class="logo">INTERCHAT</div>
   <div>🔔</div>
@@ -156,7 +156,7 @@ nav .active {
   <span>💬 Chats</span>
   <span>👤 Profile</span>
 </nav>
-
+</div>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-app.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-auth.js";
@@ -226,6 +226,8 @@ document.getElementById("signup").addEventListener("click", async () => {
     });
 
     message.textContent = "Account created successfully!";
+    document.getElementById("auth-section").style.display = "none";
+document.getElementById("app-screen").style.display = "block";
   } catch (error) {
     message.textContent = error.message;
   }
@@ -240,6 +242,7 @@ document.getElementById("login").addEventListener("click", async () => {
     );
     message.textContent = "Welcome back to INTERCHAT!";
     document.getElementById("auth-section").style.display = "none";
+    document.getElementById("app-screen").style.display = "block";
   } catch (error) {
     message.textContent = error.message;
   }
