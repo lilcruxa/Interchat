@@ -148,8 +148,7 @@ nav .active {
   </div>
 </div>
 
-
-    style="width:100%;padding:12px;background:#09090f;color:white;border:1px solid #333;border-radius:10px;min-height:90px;"></>
+<textarea id="post-text" placeholder="What's happening?" style="width:100%;padding:12px;background:#09090f;color:white;border:1px solid #333;border-radius:10px;min-height:90px;"></textarea>
   <button id="publish-post" style="width:100%;padding:12px;margin-top:10px;background:#9b7bff;color:white;border:0;border-radius:10px;">
     Publish
   </button>
@@ -170,7 +169,11 @@ nav .active {
 </div>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-app.js";
-import { getAuth } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-auth.js";
+import {
+  getAuth,
+  setPersistence,
+  browserLocalPersistence
+} from "https://www.gstatic.com/firebasejs/13.4.0/firebase-auth.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -306,7 +309,6 @@ document.getElementById("publish-post").addEventListener("click", async () => {
     postMessage.textContent = error.message;
   }
 });
-  const content = document.getElementById("post-content").value.trim();
 
   if (!content) {
     alert("Please write something first!");
@@ -405,4 +407,3 @@ feed.appendChild(postElement);
 </script>
 </body>
 </html>
- 
