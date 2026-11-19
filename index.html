@@ -106,7 +106,7 @@ nav .active {
 </style>
 </head>
 
-<body>
+<bod>
 
 <header>
   <div class="logo">INTERCHAT</div>
@@ -134,7 +134,17 @@ nav .active {
   </div>
 </div>
 
-<div class="post">
+<div class="post" id="create-post">
+  <h3>Create a post 🌍</h3>
+  <textarea id="post-text" placeholder="What's happening in your world?" 
+    style="width:100%;padding:12px;background:#09090f;color:white;border:1px solid #333;border-radius:10px;min-height:90px;"></textarea>
+  <button id="publish-post" style="width:100%;padding:12px;margin-top:10px;background:#9b7bff;color:white;border:0;border-radius:10px;">
+    Publish
+  </button>
+  <p id="post-message"></p>
+</div>
+
+<div   class="post">
   <h3>Welcome to INTERCHAT 🌍</h3>
   <p>Your world. Your people. Your conversation. Connect with the world on INTERCHAT!</p>
 </div>
@@ -168,8 +178,6 @@ window.auth = auth;
 window.db = db;
 console.log("INTERCHAT Firebase initialized!");
 </script>
-
-</body>
 <div id="auth-section" style="padding:20px; background:#111827; color:white; border-radius:12px; margin:20px;">
   <h2>Welcome to INTERCHAT</h2>
   <p>Create your account or sign in.</p>
@@ -195,8 +203,10 @@ console.log("INTERCHAT Firebase initialized!");
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword }
 from "https://www.gstatic.com/firebasejs/13.4.0/firebase-auth.js";
 
-import { doc, setDoc, serverTimestamp }
-from "https://www.gstatic.com/firebasejs/13.4.0/firebase-firestore.js";
+import {
+  doc, setDoc, serverTimestamp,
+  collection, addDoc, query, orderBy, onSnapshot
+} from "https://www.gstatic.com/firebasejs/13.4.0/firebase-firestore.js";
 
 const emailInput = document.getElementById("email");
 const passwordInput = document.getElementById("password");
@@ -234,4 +244,36 @@ document.getElementById("login").addEventListener("click", async () => {
     message.textContent = error.message;
   }
 });
-</script></html>
+  
+const postText = document.getElementById("post-text");
+const postMessage = document.getElementById("post-message");
+
+document.getElementById("publish-post").addEventListener("click", async () => {
+  const text = postText.value.trim();
+
+  if (!window.auth.currentUser) {
+    postMessage.textContent = "Please sign in first.";
+    return;
+  }
+
+  if (!text) {
+    postMessage.textContent = "Write something before publishing.";
+    return;
+  }
+
+  try {
+    await addDoc(collection(window.db, "posts"), {
+      text: text,
+      userId: window.auth.currentUser.uid,
+      email: window.auth.currentUser.email,
+      createdAt: serverTimestamp()
+    });
+
+    postText.value = "";
+    postMessage.textContent = "Your post has been published!";
+  } catch (error) {
+    postMessage.textContent = error.message;
+  }
+});
+
+</script></body></html>
