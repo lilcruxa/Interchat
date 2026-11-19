@@ -164,7 +164,8 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
-
+window.auth = auth;
+window.db = db;
 console.log("INTERCHAT Firebase initialized!");
 </script>
 
@@ -206,9 +207,9 @@ document.getElementById("signup").addEventListener("click", async () => {
   const password = passwordInput.value;
 
   try {
-    const result = await createUserWithEmailAndPassword(auth, email, password);
+    const result = await createUserWithEmailAndPassword(window.auth, email, password);
 
-    await setDoc(doc(db, "users", result.user.uid), {
+    await setDoc(doc(window.db, "users", result.user.uid), {
       email: result.user.email,
       username: email.split("@")[0],
       createdAt: serverTimestamp()
@@ -223,7 +224,7 @@ document.getElementById("signup").addEventListener("click", async () => {
 document.getElementById("login").addEventListener("click", async () => {
   try {
     await signInWithEmailAndPassword(
-      auth,
+      window.auth,
       emailInput.value.trim(),
       passwordInput.value
     );
