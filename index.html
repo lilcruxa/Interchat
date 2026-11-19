@@ -69,10 +69,24 @@ header {
 
 .post {
   margin: 15px;
-  padding: 15px;
+  padding: 18px;
   background: #191923;
-  border-radius: 14px;
+  border: 1px solid #29293a;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  overflow-wrap: anywhere;
 }
+
+.post small {
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.post p {
+  color: #eee;
+  line-height: 1.6;
+  margin-top: 5px;
+  }
 
 .post h3 {
   margin-bottom: 10px;
@@ -134,24 +148,18 @@ nav .active {
   </div>
 </div>
 
-<div class="post" id="create-post">
-  <h3>Create a post 🌍</h3>
-  <textarea id="post-text" placeholder="What's happening in your world?" 
-    style="width:100%;padding:12px;background:#09090f;color:white;border:1px solid #333;border-radius:10px;min-height:90px;"></textarea>
+
+    style="width:100%;padding:12px;background:#09090f;color:white;border:1px solid #333;border-radius:10px;min-height:90px;"></>
   <button id="publish-post" style="width:100%;padding:12px;margin-top:10px;background:#9b7bff;color:white;border:0;border-radius:10px;">
     Publish
   </button>
   <p id="post-message"></p>
-</div>
+</>
 
 <div   class="post">
   <h3> welcome to INTERCHAT 🌍</h3>
   <p>Your world. Your people. Your conversation. Connect with the world on INTERCHAT!</p>
 </div><div id="feed-list"></div>
-<div class="create-post">
-  <textarea id="post-content" placeholder="What's happening?"></textarea>
-  <button onclick="createPost()">Post</button>
-</div>
 <nav>
   <span class="active">⌂ Home</span>
   <span>🔍 Explore</span>
@@ -175,8 +183,13 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
+
 const auth = getAuth(app);
+
+await setPersistence(auth, browserLocalPersistence);
+
 const db = getFirestore(app);
+
 window.auth = auth;
 window.db = db;
 console.log("INTERCHAT Firebase initialized!");
@@ -211,7 +224,8 @@ import {
 
 import {
   doc, setDoc, serverTimestamp,
-  collection, addDoc, query, orderBy, onSnapshot
+collection, addDoc, query, orderBy, onSnapshot,
+updateDoc, increment, arrayUnion, arrayRemove
 } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-firestore.js";
 
 const emailInput = document.getElementById("email");
@@ -292,7 +306,6 @@ document.getElementById("publish-post").addEventListener("click", async () => {
     postMessage.textContent = error.message;
   }
 });
-async function createPost() {
   const content = document.getElementById("post-content").value.trim();
 
   if (!content) {
@@ -319,25 +332,77 @@ async function createPost() {
   } catch (error) {
     alert(error.message);
   }
-  }
-  onSnapshot(collection(db, "posts"), (snapshot) => {
+
+  onSnapshot(collection(window.db, "posts"), (snapshot) => {
   const feed = document.getElementById("feed-list");
 
   feed.innerHTML = "";
 
-  snapshot.forEach((doc) => {
-    const post = doc.data();
+  snapshot.forEach((postDoc) => {
+    const post = postDoc.data();
 
     const postElement = document.createElement("div");
-    postElement.className = "post-card";
+    postElement.className = "post";
+
+    const author = document.createElement("small");
+    author.textContent = post.email || "INTERCHAT User";
+    author.style.color = "#9b7bff";
+    author.style.display = "block";
+    author.style.marginBottom = "8px";
 
     const content = document.createElement("p");
-    content.textContent = post.content;
+    content.textContent = post.content || post.text || "";
 
-    postElement.appendChild(content);
-    feed.appendChild(postElement);
+    const likeButton = document.createElement("button");
+const likedBy = post.likedBy || [];
+const user = window.auth.currentUser;
+const hasLiked = user && likedBy.includes(user.uid);
+
+likeButton.textContent = hasLiked
+  ? `❤️ Liked (${likedBy.length})`
+  : `🤍 Like (${likedBy.length})`;
+    likeButton.addEventListener("click", async () => {
+  const user = window.auth.currentUser;
+
+  if (!user) {
+    alert("Please sign in first.");
+    return;
+  }
+
+  try {
+    const postRef = doc(window.db, "posts", postDoc.id);
+    const likedBy = post.likedBy || [];
+
+    if (likedBy.includes(user.uid)) {
+      await updateDoc(postRef, {
+        likedBy: arrayRemove(user.uid)
+      });
+    } else {
+      await updateDoc(postRef, {
+        likedBy: arrayUnion(user.uid)
+      });
+    }
+  } catch (error) {
+    alert(error.message);
+  }
+});
+likeButton.style.padding = "9px 15px";
+likeButton.style.marginTop = "12px";
+likeButton.style.background = "#29243d";
+likeButton.style.color = "white";
+likeButton.style.border = "0";
+likeButton.style.borderRadius = "8px";
+
+postElement.appendChild(author);
+postElement.appendChild(content);
+postElement.appendChild(likeButton);
+
+feed.appendChild(postElement);
   });
+}, (error) => {
+  console.error("Feed error:", error);
 });
 </script>
 </body>
 </html>
+ 
