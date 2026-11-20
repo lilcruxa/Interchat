@@ -1,5 +1,4 @@
-
-<!DOCTYPE html>
+margin-toppublish-publish-postublish-post<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -177,8 +176,7 @@ button {
   style="width:100%;padding:12px;background:#09090f;color:white;border:1px solid #333;border-radius:10px;min-height:90px;">
 </textarea>
 
-<button id="publish-post"
-  style="width:100%;padding:12px;margin-top:10px;background:#9b7bff;color:white;border:0;border-radius:10px;">
+<button id="publishmargin-toptyle="width:100%;padding:12px;margin-top:10px;background:#9b7bff;color:white;border:0;border-radius:10px;">
   Publish
 </button>
 
@@ -191,16 +189,17 @@ button {
 </div>
 
 <!-- LIVE FEED -->
-<div id="feed-list"></div>
-
-<!-- NAVIGATION -->
-<nav>
-  <span class="active">⌂ Home</span>
+<div id="feed-list"></div>s="active">⌂ Home</span>
   <span>🔍 Explore</span>
   <span>＋ Post</span>
   <span>💬 Chats</span>
-  <span>👤 Profile</span>
+  <span onclick="openProfile()">👤 Profile</span>
 </nav>
+
+</div>
+
+<!-- AUTHENTICATION -->
+<div i
 
 </div>
 
@@ -309,9 +308,7 @@ function renderPosts() {
   : (post.email || "INTERCHAT User");
     author.style.color = "#9b7bff";
     author.style.display = "block";
-    author.style.marginBottom = "8px";
-
-    const content = document.createElement("p");
+    author.style.marginBottom = "8script    const content = document.createElement("p");
     content.textContent = post.text || post.content || "";
 
     const likeButton = document.createElement("button");
@@ -566,6 +563,20 @@ onSnapshot(postsQuery, (snapshot) => {
   console.error("Feed error:", error);
   postMessage.textContent = "Unable to load posts: " + error.message;
 });
+  <!-- PROFILE SCREEN -->
+<div id="profileScreen" style="display:none; padding:20px;">
+  <div style="text-align:center;">
+    <div id="profileAvatar" style="font-size:70px;">👤</div>
+    <h2 id="profileName">My Profile</h2>
+    <p id="profileUsername">@username</p>
+    <p id="profileBio">No bio yet.</p>
+  </div>
+
+  <div style="margin-top:25px; border-top:1px solid #333; padding-top:15px;">
+    <h3>My Posts</h3>
+    <div id="profilePosts"></div>
+  </div>
+</div>
 </script>
 
 </body>
