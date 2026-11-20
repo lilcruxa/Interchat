@@ -153,7 +153,6 @@ nav .active {
     Publish
   </button>
   <p id="post-message"></p>
-</>
 
 <div   class="post">
   <h3> welcome to INTERCHAT 🌍</h3>
@@ -198,7 +197,7 @@ window.db = db;
 console.log("INTERCHAT Firebase initialized!");
 </script>
 <div id="auth-section" style="padding:20px; background:#111827; color:white; border-radius:12px; margin:20px;">
-  <h2>e to INTERCHAT</h2>
+  <h2>Welcome to INTERCHAT</h2>
   <p>Create your account or sign in.</p>
 
   <input id="email" type="email" placeholder="Email address"
@@ -217,7 +216,6 @@ console.log("INTERCHAT Firebase initialized!");
 
   <p id="auth-message"></p>
 </div>
-
 <script type="module">
 import {
   createUserWithEmailAndPassword,
@@ -226,29 +224,42 @@ import {
 } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-auth.js";
 
 import {
-  doc, setDoc, serverTimestamp,
-collection, addDoc, query, orderBy, onSnapshot,
-updateDoc, increment, arrayUnion, arrayRemove
+  doc,
+  setDoc,
+  serverTimestamp,
+  collection,
+  addDoc,
+  onSnapshot,
+  updateDoc,
+  arrayUnion,
+  arrayRemove
 } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-firestore.js";
 
+// Authentication elements
 const emailInput = document.getElementById("email");
 const passwordInput = document.getElementById("password");
 const message = document.getElementById("auth-message");
+
+// Watch login status
 onAuthStateChanged(window.auth, (user) => {
-  if (user) {
-    document.getElementById("auth-section").style.display = "none";
-    document.getElementById("app-screen").style.display = "block";
-  } else {
-    document.getElementById("auth-section").style.display = "block";
-    document.getElementById("app-screen").style.display = "none";
-  }
+  document.getElementById("auth-section").style.display =
+    user ? "none" : "block";
+
+  document.getElementById("app-screen").style.display =
+    user ? "block" : "none";
 });
+
+// Create account
 document.getElementById("signup").addEventListener("click", async () => {
   const email = emailInput.value.trim();
   const password = passwordInput.value;
 
   try {
-    const result = await createUserWithEmailAndPassword(window.auth, email, password);
+    const result = await createUserWithEmailAndPassword(
+      window.auth,
+      email,
+      password
+    );
 
     await setDoc(doc(window.db, "users", result.user.uid), {
       email: result.user.email,
@@ -257,13 +268,12 @@ document.getElementById("signup").addEventListener("click", async () => {
     });
 
     message.textContent = "Account created successfully!";
-    document.getElementById("auth-section").style.display = "none";
-document.getElementById("app-screen").style.display = "block";
   } catch (error) {
     message.textContent = error.message;
   }
 });
 
+// Sign in
 document.getElementById("login").addEventListener("click", async () => {
   try {
     await signInWithEmailAndPassword(
@@ -271,14 +281,14 @@ document.getElementById("login").addEventListener("click", async () => {
       emailInput.value.trim(),
       passwordInput.value
     );
-    message.textContent = "e back to INTERCHAT!";
-    document.getElementById("auth-section").style.display = "none";
-    document.getElementById("app-screen").style.display = "block";
+
+    message.textContent = "Welcome back to INTERCHAT!";
   } catch (error) {
     message.textContent = error.message;
   }
 });
-  
+
+// Publish a text post
 const postText = document.getElementById("post-text");
 const postMessage = document.getElementById("post-message");
 
@@ -300,7 +310,8 @@ document.getElementById("publish-post").addEventListener("click", async () => {
       text: text,
       userId: window.auth.currentUser.uid,
       email: window.auth.currentUser.email,
-      createdAt: serverTimestamp()
+      createdAt: serverTimestamp(),
+      likedBy: []
     });
 
     postText.value = "";
@@ -310,34 +321,9 @@ document.getElementById("publish-post").addEventListener("click", async () => {
   }
 });
 
-  if (!content) {
-    alert("Please write something first!");
-    return;
-  }
-
-  try {
-    const user = auth.currentUser;
-
-    if (!user) {
-      alert("Please log in first.");
-      return;
-    }
-
-    await addDoc(collection(db, "posts"), {
-      content: content,
-      userId: user.uid,
-      createdAt: new Date()
-    });
-
-    document.getElementById("post-content").value = "";
-    alert("Post published successfully!");
-  } catch (error) {
-    alert(error.message);
-  }
-
-  onSnapshot(collection(window.db, "posts"), (snapshot) => {
+// Display posts and likes
+onSnapshot(collection(window.db, "posts"), (snapshot) => {
   const feed = document.getElementById("feed-list");
-
   feed.innerHTML = "";
 
   snapshot.forEach((postDoc) => {
@@ -353,57 +339,60 @@ document.getElementById("publish-post").addEventListener("click", async () => {
     author.style.marginBottom = "8px";
 
     const content = document.createElement("p");
-    content.textContent = post.content || post.text || "";
+    content.textContent = post.text || post.content || "";
 
     const likeButton = document.createElement("button");
-const likedBy = post.likedBy || [];
-const user = window.auth.currentUser;
-const hasLiked = user && likedBy.includes(user.uid);
-
-likeButton.textContent = hasLiked
-  ? `❤️ Liked (${likedBy.length})`
-  : `🤍 Like (${likedBy.length})`;
-    likeButton.addEventListener("click", async () => {
-  const user = window.auth.currentUser;
-
-  if (!user) {
-    alert("Please sign in first.");
-    return;
-  }
-
-  try {
-    const postRef = doc(window.db, "posts", postDoc.id);
     const likedBy = post.likedBy || [];
+    const user = window.auth.currentUser;
+    const hasLiked = user && likedBy.includes(user.uid);
 
-    if (likedBy.includes(user.uid)) {
-      await updateDoc(postRef, {
-        likedBy: arrayRemove(user.uid)
-      });
-    } else {
-      await updateDoc(postRef, {
-        likedBy: arrayUnion(user.uid)
-      });
-    }
-  } catch (error) {
-    alert(error.message);
-  }
-});
-likeButton.style.padding = "9px 15px";
-likeButton.style.marginTop = "12px";
-likeButton.style.background = "#29243d";
-likeButton.style.color = "white";
-likeButton.style.border = "0";
-likeButton.style.borderRadius = "8px";
+    likeButton.textContent = hasLiked
+      ? `❤️ Liked (${likedBy.length})`
+      : `🤍 Like (${likedBy.length})`;
 
-postElement.appendChild(author);
-postElement.appendChild(content);
-postElement.appendChild(likeButton);
+    likeButton.addEventListener("click", async () => {
+      const currentUser = window.auth.currentUser;
 
-feed.appendChild(postElement);
+      if (!currentUser) {
+        alert("Please sign in first.");
+        return;
+      }
+
+      try {
+        const postRef = doc(window.db, "posts", postDoc.id);
+
+        if (likedBy.includes(currentUser.uid)) {
+          await updateDoc(postRef, {
+            likedBy: arrayRemove(currentUser.uid)
+          });
+        } else {
+          await updateDoc(postRef, {
+            likedBy: arrayUnion(currentUser.uid)
+          });
+        }
+      } catch (error) {
+        alert(error.message);
+      }
+    });
+
+    likeButton.style.padding = "9px 15px";
+    likeButton.style.marginTop = "12px";
+    likeButton.style.background = "#29243d";
+    likeButton.style.color = "white";
+    likeButton.style.border = "0";
+    likeButton.style.borderRadius = "8px";
+
+    postElement.appendChild(author);
+    postElement.appendChild(content);
+    postElement.appendChild(likeButton);
+
+    feed.appendChild(postElement);
   });
 }, (error) => {
   console.error("Feed error:", error);
 });
+</script>
+
 </script>
 </body>
 </html>
