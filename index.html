@@ -539,7 +539,44 @@ window.openProfile = async function () {
     console.error("Profile error:", error);
   }
 };
+// EDIT PROFILE
+window.editProfile = async function () {
+  if (!currentUser) {
+    alert("Please sign in first.");
+    return;
+  }
 
+  const newName = prompt("Enter your display name:");
+  if (newName === null || !newName.trim()) return;
+
+  const newUsername = prompt("Enter your username:");
+  if (newUsername === null || !newUsername.trim()) return;
+
+  const newBio = prompt("Enter your bio:");
+  if (newBio === null) return;
+
+  try {
+    await setDoc(
+      doc(window.db, "users", currentUser.uid),
+      {
+        displayName: newName.trim(),
+        username: newUsername.trim().replace("@", ""),
+        bio: newBio.trim()
+      },
+      { merge: true }
+    );
+
+    document.getElementById("profile-name").textContent = newName.trim();
+    document.getElementById("profile-username").textContent =
+      "@" + newUsername.trim().replace("@", "");
+    document.getElementById("profile-bio").textContent =
+      newBio.trim() || "No bio yet.";
+
+    alert("Profile updated successfully!");
+  } catch (error) {
+    alert("Profile update failed: " + error.message);
+  }
+};
 // OPEN HOME
 window.openHome = function () {
   document.getElementById("home-tab").classList.add("active");
