@@ -170,9 +170,7 @@ nav .active {
 import { initializeApp } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-app.js";
 import {
   getAuth,
-  setPersistence,
-  browserLocalPersistence
-} from "https://www.gstatic.com/firebasejs/13.4.0/firebase-auth.js";
+  } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-auth.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -187,13 +185,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 
 const auth = getAuth(app);
-
-try {
-  await setPersistence(auth, browserLocalPersistence);
-} catch (error) {
-  console.error("Persistence error:", error);
-}
-
+  
 const db = getFirestore(app);
 
 window.auth = auth;
