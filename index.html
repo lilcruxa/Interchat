@@ -304,7 +304,9 @@ function renderPosts() {
     postElement.className = "post";
 
     const author = document.createElement("small");
-    author.textContent = post.email || "INTERCHAT User";
+    author.textContent = post.username
+  ? "@" + post.username
+  : (post.email || "INTERCHAT User");
     author.style.color = "#9b7bff";
     author.style.display = "block";
     author.style.marginBottom = "8px";
@@ -483,7 +485,7 @@ document.getElementById("signup").addEventListener("click", async () => {
 
     await setDoc(doc(window.db, "users", result.user.uid), {
       email: result.user.email,
-      username: email.split("@")[0],
+      username: email.split("@")[0].toLowerCase(), displayName: email.split("@")[0], bio: "", profilePicture: ""
       createdAt: serverTimestamp()
     });
 
@@ -536,6 +538,7 @@ document.getElementById("publish-post").addEventListener("click", async () => {
       text: text,
       userId: currentUser.uid,
       email: currentUser.email,
+      username: currentUser.email.split("@")[0].toLowerCase(),
       createdAt: serverTimestamp(),
       likedBy: []
     });
