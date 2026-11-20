@@ -285,7 +285,14 @@ document.getElementById("login").addEventListener("click", async () => {
     message.textContent = error.message;
   }
 });
-
+// Sign out
+document.getElementById("logout").addEventListener("click", async () => {
+  try {
+    await signOut(window.auth);
+  } catch (error) {
+    alert(error.message);
+  }
+});
 // Publish a text post
 const postText = document.getElementById("post-text");
 const postMessage = document.getElementById("post-message");
