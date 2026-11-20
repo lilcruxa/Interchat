@@ -280,6 +280,8 @@ import {
   updateDoc,
   arrayUnion,
   arrayRemove
+    getDocs,
+  where,
 } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-firestore.js";
 
 // ELEMENTS
@@ -351,7 +353,106 @@ function renderPosts() {
     postElement.appendChild(author);
     postElement.appendChild(content);
     postElement.appendChild(likeButton);
+// COMMENTS SECTION
+const commentsSection = document.createElement("div");
+commentsSection.style.marginTop = "15px";
 
+const commentsTitle = document.createElement("h4");
+commentsTitle.textContent = "Comments";
+commentsTitle.style.marginBottom = "10px";
+
+const commentsList = document.createElement("div");
+commentsList.style.marginBottom = "10px";
+
+const commentInput = document.createElement("input");
+commentInput.type = "text";
+commentInput.placeholder = "Write a comment...";
+commentInput.style.width = "75%";
+commentInput.style.padding = "10px";
+commentInput.style.borderRadius = "8px";
+commentInput.style.border = "1px solid #333";
+commentInput.style.background = "#09090f";
+commentInput.style.color = "white";
+
+const commentButton = document.createElement("button");
+commentButton.textContent = "Send";
+commentButton.style.padding = "10px";
+commentButton.style.marginLeft = "5px";
+commentButton.style.background = "#9b7bff";
+commentButton.style.color = "white";
+commentButton.style.border = "0";
+commentButton.style.borderRadius = "8px";
+
+commentsSection.appendChild(commentsTitle);
+commentsSection.appendChild(commentsList);
+commentsSection.appendChild(commentInput);
+commentsSection.appendChild(commentButton);
+    // LOAD SAVED COMMENTS
+async function loadComments() {
+  try {
+    const commentsRef = collection(
+      window.db,
+      "posts",
+      postDoc.id,
+      "comments"
+    );
+
+    const snapshot = await getDocs(commentsRef);
+    commentsList.innerHTML = "";
+
+    snapshot.forEach((commentDoc) => {
+      const comment = commentDoc.data();
+
+      const commentItem = document.createElement("p");
+      commentItem.style.marginBottom = "8px";
+      commentItem.style.fontSize = "13px";
+
+      const commentAuthor = document.createElement("strong");
+      commentAuthor.textContent =
+        (comment.email || "INTERCHAT User") + ": ";
+
+      const commentText = document.createElement("span");
+      commentText.textContent = comment.text || "";
+
+      commentItem.appendChild(commentAuthor);
+      commentItem.appendChild(commentText);
+      commentsList.appendChild(commentItem);
+    });
+  } catch (error) {
+    console.error("Comments error:", error);
+  }
+}
+
+loadComments();
+// SAVE COMMENT
+commentButton.addEventListener("click", async () => {
+  const commentText = commentInput.value.trim();
+
+  if (!currentUser) {
+    alert("Please sign in first.");
+    return;
+  }
+
+  if (!commentText) {
+    alert("Write a comment first.");
+    return;
+  }
+
+  try {
+    await addDoc(collection(window.db, "posts", postDoc.id, "comments"), {
+      text: commentText,
+      userId: currentUser.uid,
+      email: currentUser.email,
+      createdAt: serverTimestamp()
+    });
+
+    commentInput.value = "";
+    await loadComments();
+  } catch (error) {
+    alert(error.message);
+  }
+});
+postElement.appendChild(commentsSection);
     feed.appendChild(postElement);
   });
 }
