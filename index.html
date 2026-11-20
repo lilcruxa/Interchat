@@ -400,4 +400,26 @@ onSnapshot(collection(window.db, "posts"), (snapshot) => {
 
 </script>
 </body>
+  <div id="error-box" style="background:#300;color:white;padding:12px;margin:10px;border-radius:8px;display:none;">
+  <strong>INTERCHAT ERROR:</strong>
+  <pre id="error-text" style="white-space:pre-wrap;"></pre>
+</div>
+
+<script>
+window.addEventListener("error", function(event) {
+  const box = document.getElementById("error-box");
+  const text = document.getElementById("error-text");
+
+  box.style.display = "block";
+  text.textContent = event.message + " | Line: " + event.lineno;
+});
+
+window.addEventListener("unhandledrejection", function(event) {
+  const box = document.getElementById("error-box");
+  const text = document.getElementById("error-text");
+
+  box.style.display = "block";
+  text.textContent = "Promise error: " + event.reason;
+});
+</script>
 </html>
