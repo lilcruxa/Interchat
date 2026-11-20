@@ -483,11 +483,14 @@ document.getElementById("signup").addEventListener("click", async () => {
       password
     );
 
-    await setDoc(doc(window.db, "users", result.user.uid), {
-      email: result.user.email,
-      username: email.split("@")[0].toLowerCase(), displayName: email.split("@")[0], bio: "", profilePicture: ""
-      createdAt: serverTimestamp()
-    });
+   await setDoc(doc(window.db, "users", result.user.uid), {
+  email: result.user.email,
+  username: email.split("@")[0].toLowerCase(),
+  displayName: email.split("@")[0],
+  bio: "",
+  profilePicture: "",
+  createdAt: serverTimestamp()
+});
 
     message.textContent = "Account created successfully!";
   } catch (error) {
