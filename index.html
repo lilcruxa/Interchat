@@ -17,11 +17,11 @@ body {
   background: #09090f;
   color: white;
   font-family: Arial, sans-serif;
-  padding-bottom: 75px;
+  padding-bottom: 80px;
 }
 
 header {
-  padding: 20px;
+  padding: 18px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -32,6 +32,19 @@ header {
   font-size: 25px;
   font-weight: bold;
   color: #9b7bff;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: .5;
+  cursor: not-allowed;
+}
+
+input, textarea {
+  font-family: Arial, sans-serif;
 }
 
 .search {
@@ -73,23 +86,22 @@ header {
   background: #191923;
   border: 1px solid #29293a;
   border-radius: 16px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
   overflow-wrap: anywhere;
-}
-
-.post small {
-  font-size: 12px;
-  font-weight: bold;
 }
 
 .post p {
   color: #ccc;
   line-height: 1.6;
-  margin-top: 5px;
+  margin-top: 8px;
+  white-space: pre-wrap;
 }
 
-.post h3 {
-  margin-bottom: 10px;
+.post-author {
+  color: #b69aff;
+  background: none;
+  border: none;
+  font-weight: bold;
+  font-size: 14px;
 }
 
 .like-button {
@@ -99,11 +111,95 @@ header {
   color: white;
   border: 0;
   border-radius: 8px;
-  cursor: pointer;
 }
 
-.like-button:disabled {
-  opacity: 0.6;
+.comment-box {
+  display: flex;
+  gap: 5px;
+  margin-top: 12px;
+}
+
+.comment-box input {
+  flex: 1;
+  min-width: 0;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #333;
+  background: #09090f;
+  color: white;
+}
+
+.comment-box button {
+  padding: 10px;
+  background: #9b7bff;
+  color: white;
+  border: 0;
+  border-radius: 8px;
+}
+
+.comments {
+  margin-top: 12px;
+  font-size: 13px;
+  color: #ccc;
+}
+
+.comments p {
+  margin-bottom: 8px;
+}
+
+.main-button {
+  padding: 12px 18px;
+  background: #29243d;
+  color: white;
+  border: 0;
+  border-radius: 10px;
+}
+
+.primary-button {
+  padding: 13px;
+  background: #9b7bff;
+  color: white;
+  border: 0;
+  border-radius: 10px;
+  width: 100%;
+}
+
+.profile-header {
+  text-align: center;
+  padding: 30px 15px;
+}
+
+.profile-avatar {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  background: #252535;
+  margin: auto;
+  display: grid;
+  place-items: center;
+  font-size: 38px;
+  border: 2px solid #9b7bff;
+}
+
+.profile-action {
+  margin: 15px 5px 0;
+}
+
+.settings-item {
+  display: block;
+  width: calc(100% - 30px);
+  margin: 12px 15px;
+  padding: 17px;
+  text-align: left;
+  background: #191923;
+  color: white;
+  border: 1px solid #29293a;
+  border-radius: 12px;
+  font-size: 15px;
+}
+
+.settings-item.danger {
+  color: #ff7777;
 }
 
 nav {
@@ -116,20 +212,89 @@ nav {
   justify-content: space-around;
   padding: 16px 5px;
   border-top: 1px solid #29293a;
+  z-index: 100;
 }
 
 nav span {
   color: #aaa;
   font-size: 12px;
+  cursor: pointer;
 }
 
 nav .active {
   color: #a88aff;
 }
 
-button {
-  cursor: pointer;
+#auth-section {
+  padding: 20px;
+  background: #111827;
+  border-radius: 12px;
+  margin: 20px;
 }
+
+#auth-section input {
+  width: 100%;
+  padding: 12px;
+  margin: 8px 0;
+  background: #252535;
+  color: white;
+  border: 1px solid #444;
+  border-radius: 8px;
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.85);
+  z-index: 200;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.modal-content {
+  background: #191923;
+  width: 100%;
+  max-width: 400px;
+  padding: 22px;
+  border-radius: 18px;
+  border: 1px solid #333;
+}
+
+.modal-content input,
+.modal-content textarea {
+  width: 100%;
+  padding: 12px;
+  margin: 8px 0 15px;
+  background: #252535;
+  color: white;
+  border: 1px solid #444;
+  border-radius: 9px;
+}
+
+#post-text {
+  width: calc(100% - 30px);
+  margin: 15px;
+  padding: 12px;
+  background: #09090f;
+  color: white;
+  border: 1px solid #333;
+  border-radius: 10px;
+  min-height: 90px;
+}
+
+#publish-post {
+  width: calc(100% - 30px);
+  margin: 0 15px;
+}
+
+#post-message {
+  padding: 10px 15px;
+  color: #b69aff;
+}
+
 </style>
 </head>
 
@@ -140,131 +305,270 @@ button {
 
 <header>
   <div class="logo">INTERCHAT</div>
-
-  <button id="logout"
-    style="background:#29243d;color:white;border:0;padding:10px 14px;border-radius:8px;">
-    Sign Out
-  </button>
+  <span style="color:#aaa;">🌍 Connect with the world</span>
 </header>
 
-<div class="search">🔍 Search INTERCHAT...</div>
+<!-- HOME SCREEN -->
+<div id="home-screen">
 
-<div class="stories">
-  <div class="story">
-    <div class="circle">+</div>
-    Your story
+  <div class="search">
+    🔍 Explore INTERCHAT
   </div>
 
-  <div class="story">
-    <div class="circle">👤</div>
-    Alex
+  <div class="stories">
+    <div class="story">
+      <div class="circle">+</div>
+      Your story
+    </div>
+    <div class="story">
+      <div class="circle">👤</div>
+      Alex
+    </div>
+    <div class="story">
+      <div class="circle">👤</div>
+      Sarah
+    </div>
+    <div class="story">
+      <div class="circle">👤</div>
+      John
+    </div>
   </div>
 
-  <div class="story">
-    <div class="circle">👤</div>
-    Sarah
-  </div>
+  <textarea id="post-text"
+    placeholder="What's happening?"></textarea>
 
-  <div class="story">
-    <div class="circle">👤</div>
-    John
-  </div>
-</div>
-
-<!-- CREATE POST -->
-<textarea id="post-text"
-  placeholder="What's happening?"
-  style="width:100%;padding:12px;background:#09090f;color:white;border:1px solid #333;border-radius:10px;min-height:90px;">
-</textarea>
-
-<button id="publish-post"
-  style="width:100%;padding:12px;margin-top:10px;background:#9b7bff;color:white;border:0;border-radius:10px;">
-  Publish
-</button>
-
-<p id="post-message"></p>
-
-<!-- WELCOME POST -->
-<div class="post">
-  <h3>Welcome to INTERCHAT 🌍</h3>
-  <p>Your world. Your people. Your conversation. Connect with the world on INTERCHAT!</p>
-</div>
-
-<!-- LIVE FEED -->
-<div id="feed-list"></div>
-<!-- PROFILE SCREEN -->
-  <button onclick="openHome()" style="margin:15px;padding:10px 18px;background:#252535;color:white;border:0;border-radius:10px;">
-  ← Home
+  <button id="publish-post" class="primary-button">
+    Publish
   </button>
+
+  <p id="post-message"></p>
+
+  <div class="post">
+    <h3>Welcome to INTERCHAT 🌍</h3>
+    <p>Your world. Your people. Your conversation. Connect with the world on INTERCHAT!</p>
+  </div>
+
+  <div id="feed-list"></div>
+
+</div>
+
+<!-- PROFILE SCREEN -->
 <div id="profile-screen" style="display:none;">
 
-  <div style="text-align:center;padding:25px 15px;">
-    <div id="profile-avatar" style="width:90px;height:90px;border-radius:50%;background:#252535;margin:auto;display:flex;align-items:center;justify-content:center;font-size:35px;">
-      👤
+  <button class="main-button profile-action"
+    onclick="openHome()">
+    ← Home
+  </button>
+
+  <div class="profile-header">
+
+    <div class="profile-avatar">👤</div>
+
+    <h2 id="profile-name" style="margin-top:15px;">
+      My Profile
+    </h2>
+
+    <p id="profile-username"
+      style="color:#aaa;margin-top:5px;">
+      @username
+    </p>
+
+    <p id="profile-bio"
+      style="color:#ccc;margin-top:12px;">
+      No bio yet.
+    </p>
+
+    <div id="own-profile-actions">
+
+      <button class="main-button"
+        style="margin-top:18px;"
+        onclick="editProfile()">
+        ✏️ Edit Profile
+      </button>
+
+      <button class="main-button"
+        style="margin-top:18px;"
+        onclick="openSettings()">
+        ⚙️ Settings
+      </button>
+
     </div>
 
-    <h2 id="profile-name" style="margin-top:15px;">My Profile</h2>
-
-    <p id="profile-username" style="color:#aaa;margin-top:5px;">@username</p>
-
-    <p id="profile-bio" style="margin-top:12px;color:#ccc;">No bio yet.</p>
-
-    <button onclick="editProfile()" style="margin-top:15px;background:#252535;color:white;border:none;padding:10px 20px;border-radius:20px;">
-      Edit Profile
-    </button>
   </div>
 
-  <h3 style="padding:15px;">My Posts</h3>
+  <h3 style="padding:15px;" id="profile-posts-title">
+    My Posts
+  </h3>
+
   <div id="profile-posts"></div>
 
 </div>
+
+<!-- SETTINGS SCREEN -->
+<div id="settings-screen" style="display:none;">
+
+  <button class="main-button"
+    style="margin:15px;"
+    onclick="openProfile()">
+    ← Profile
+  </button>
+
+  <h2 style="padding:15px;color:#b69aff;">
+    ⚙️ Settings
+  </h2>
+
+  <button class="settings-item"
+    onclick="editProfile()">
+    👤 Edit Profile
+  </button>
+
+  <button class="settings-item"
+    onclick="openProfile()">
+    View My Profile
+  </button>
+
+  <button class="settings-item danger"
+    onclick="logoutUser()">
+    🚪 Sign Out
+  </button>
+
+  <p style="padding:20px;color:#777;font-size:12px;">
+    INTERCHAT · Your world. Your people.
+  </p>
+
+</div>
+
+<!-- EDIT PROFILE MODAL -->
+<div id="edit-profile-modal" class="modal">
+
+  <div class="modal-content">
+
+    <h2 style="text-align:center;color:#b69aff;margin-bottom:20px;">
+      Edit Your Profile
+    </h2>
+
+    <label>Display Name</label>
+
+    <input id="edit-display-name"
+      type="text"
+      maxlength="40"
+      placeholder="Enter your name">
+
+    <label>Username</label>
+
+    <input id="edit-username"
+      type="text"
+      maxlength="20"
+      placeholder="Enter username">
+
+    <label>Bio</label>
+
+    <textarea id="edit-bio"
+      maxlength="160"
+      placeholder="Tell people about yourself..."
+      style="min-height:85px;"></textarea>
+
+    <button class="primary-button"
+      id="save-profile-button"
+      onclick="saveProfileChanges()">
+      Save Changes
+    </button>
+
+    <button class="main-button"
+      style="width:100%;margin-top:10px;"
+      onclick="closeEditProfile()">
+      Cancel
+    </button>
+
+  </div>
+</div>
+
 <!-- NAVIGATION -->
-<nav>
-  <span id="home-tab" class="active" onclick="openHome()">⌂ Home</span>
-  <span>🔍 Explore</span>
-  <span>＋ Post</span>
-  <span>💬 Chats</span>
-  <span id="profile-tab" onclick="openProfile()">👤 Profile</span>
+<nav id="main-nav">
+  <span id="home-tab" class="active"
+    onclick="openHome()">⌂ Home</span>
+
+  <span onclick="openExplore()">🔍 Explore</span>
+
+  <span onclick="focusPost()">＋ Post</span>
+
+  <span onclick="showComingSoon('Chats')">💬 Chats</span>
+
+  <span id="profile-tab"
+    onclick="openProfile()">👤 Profile</span>
 </nav>
 
 </div>
 
 <!-- AUTHENTICATION -->
-<div id="auth-section"
-  style="padding:20px;background:#111827;color:white;border-radius:12px;margin:20px;">
+<div id="auth-section">
 
-  <h2>Welcome to INTERCHAT</h2>
-  <p>Create your account or sign in.</p>
+  <h2 style="color:#b69aff;">Welcome to INTERCHAT</h2>
+
+  <p style="margin:10px 0 15px;">
+    Create your account or sign in.
+  </p>
 
   <input id="email"
     type="email"
     placeholder="Email address"
-    style="width:100%;padding:12px;margin:8px 0;">
+    autocomplete="email">
 
   <input id="password"
     type="password"
     placeholder="Password"
-    style="width:100%;padding:12px;margin:8px 0;">
+    autocomplete="current-password">
 
   <button id="signup"
-    style="padding:12px;width:100%;margin:6px 0;">
+    class="primary-button"
+    style="margin:6px 0;">
     Create Account
   </button>
 
   <button id="login"
-    style="padding:12px;width:100%;margin:6px 0;">
+    class="primary-button"
+    style="margin:6px 0;background:#29243d;">
     Sign In
   </button>
 
-  <p id="auth-message"></p>
+  <p id="auth-message"
+    style="margin-top:12px;color:#b69aff;"></p>
+
 </div>
 
-<!-- FIREBASE INITIALIZATION -->
+<!-- FIREBASE AND APP FUNCTIONS -->
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-app.js";
-import { getAuth } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-auth.js";
-import { getFirestore } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-firestore.js";
 
+import { initializeApp }
+from "https://www.gstatic.com/firebasejs/13.4.0/firebase-app.js";
+
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  onAuthStateChanged,
+  signOut
+} from "https://www.gstatic.com/firebasejs/13.4.0/firebase-auth.js";
+
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  setDoc,
+  serverTimestamp,
+  collection,
+  addDoc,
+  query,
+  orderBy,
+  onSnapshot,
+  updateDoc,
+  arrayUnion,
+  arrayRemove,
+  getDocs,
+  where
+} from "https://www.gstatic.com/firebasejs/13.4.0/firebase-firestore.js";
+
+// FIREBASE CONFIGURATION
 const firebaseConfig = {
   apiKey: "AIzaSyDjKlQjHuzQgDIqOHF_0fLJuqfL9701cJc",
   authDomain: "interchat-c1cfc.firebaseapp.com",
@@ -278,88 +582,295 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-window.auth = auth;
-window.db = db;
-
-console.log("INTERCHAT Firebase initialized!");
-</script>
-
-<!-- APP FUNCTIONS -->
-<script type="module">
-import {
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  onAuthStateChanged,
-  signOut
-} from "https://www.gstatic.com/firebasejs/13.4.0/firebase-auth.js";
-
-import {
-  doc,
-  getDoc,
-  setDoc,
-  serverTimestamp,
-  collection,
-  addDoc,
-  query,
-  orderBy,
-  onSnapshot,
-  updateDoc,
-  arrayUnion,
-  arrayRemove,
-  getDocs
-} from "https://www.gstatic.com/firebasejs/13.4.0/firebase-firestore.js";
+// APP STATE
+let currentUser = null;
+let currentProfile = {};
+let latestPosts = [];
+let currentProfileId = null;
 
 // ELEMENTS
-const emailInput = document.getElementById("email");
-const passwordInput = document.getElementById("password");
-const message = document.getElementById("auth-message");
+const feed = document.getElementById("feed-list");
 const postText = document.getElementById("post-text");
 const postMessage = document.getElementById("post-message");
-const feed = document.getElementById("feed-list");
+const authMessage = document.getElementById("auth-message");
 
-let currentUser = null;
-let latestPosts = [];
+// PROFILE HELPERS
+async function getUserProfile(uid) {
+  const snap = await getDoc(doc(db, "users", uid));
 
-// RENDER POSTS
+  if (snap.exists()) {
+    return snap.data();
+  }
+
+  return {
+    displayName: "INTERCHAT User",
+    username: "user",
+    bio: ""
+  };
+}
+
+// SCREEN NAVIGATION
+function hideScreens() {
+  document.getElementById("home-screen").style.display = "none";
+  document.getElementById("profile-screen").style.display = "none";
+  document.getElementById("settings-screen").style.display = "none";
+}
+
+function updateNavigation(active) {
+  document.getElementById("home-tab").classList.toggle(
+    "active", active === "home"
+  );
+
+  document.getElementById("profile-tab").classList.toggle(
+    "active", active === "profile"
+  );
+}
+
+window.openHome = function() {
+  hideScreens();
+
+  document.getElementById("home-screen").style.display = "block";
+
+  updateNavigation("home");
+};
+
+window.openProfile = async function(uid) {
+  if (!currentUser) return;
+
+  const targetUid = uid || currentUser.uid;
+  const isOwnProfile = targetUid === currentUser.uid;
+
+  try {
+    const profile = await getUserProfile(targetUid);
+
+    currentProfileId = targetUid;
+
+    hideScreens();
+
+    document.getElementById("profile-screen").style.display = "block";
+
+    updateNavigation(isOwnProfile ? "profile" : "");
+
+    document.getElementById("profile-name").textContent =
+      profile.displayName || "INTERCHAT User";
+
+    document.getElementById("profile-username").textContent =
+      "@" + (profile.username || "user");
+
+    document.getElementById("profile-bio").textContent =
+      profile.bio || "No bio yet.";
+
+    document.getElementById("own-profile-actions").style.display =
+      isOwnProfile ? "block" : "none";
+
+    document.getElementById("profile-posts-title").textContent =
+      isOwnProfile ? "My Posts" : "Posts";
+
+    const postsQuery = query(
+      collection(db, "posts"),
+      where("userId", "==", targetUid)
+    );
+
+    const snapshot = await getDocs(postsQuery);
+
+    const posts = snapshot.docs.sort((a, b) => {
+      const timeA = a.data().createdAt?.seconds || 0;
+      const timeB = b.data().createdAt?.seconds || 0;
+      return timeB - timeA;
+    });
+
+    const profilePosts = document.getElementById("profile-posts");
+    profilePosts.innerHTML = "";
+
+    if (posts.length === 0) {
+      profilePosts.textContent = "No posts yet.";
+      profilePosts.style.padding = "15px";
+      return;
+    }
+
+    posts.forEach(postDoc => {
+      const post = postDoc.data();
+
+      const element = document.createElement("div");
+      element.className = "post";
+
+      const content = document.createElement("p");
+      content.textContent = post.text || "";
+
+      element.appendChild(content);
+      profilePosts.appendChild(element);
+    });
+
+  } catch (error) {
+    alert("Unable to load profile: " + error.message);
+  }
+};
+
+// SETTINGS
+window.openSettings = function() {
+  hideScreens();
+
+  document.getElementById("settings-screen").style.display = "block";
+
+  updateNavigation("");
+};
+
+window.logoutUser = async function() {
+  if (!confirm("Are you sure you want to sign out?")) return;
+
+  try {
+    await signOut(auth);
+  } catch (error) {
+    alert(error.message);
+  }
+};
+
+// EDIT PROFILE
+window.editProfile = async function() {
+  if (!currentUser) return;
+
+  try {
+    const profile = await getUserProfile(currentUser.uid);
+
+    document.getElementById("edit-display-name").value =
+      profile.displayName || "";
+
+    document.getElementById("edit-username").value =
+      profile.username || "";
+
+    document.getElementById("edit-bio").value =
+      profile.bio || "";
+
+    document.getElementById("edit-profile-modal").style.display = "flex";
+
+  } catch (error) {
+    alert("Unable to open profile editor: " + error.message);
+  }
+};
+
+window.closeEditProfile = function() {
+  document.getElementById("edit-profile-modal").style.display = "none";
+};
+
+// SAVE PROFILE
+window.saveProfileChanges = async function() {
+  if (!currentUser) return;
+
+  const displayName =
+    document.getElementById("edit-display-name").value.trim();
+
+  const username =
+    document.getElementById("edit-username").value.trim()
+      .replace(/^@/, "").toLowerCase();
+
+  const bio =
+    document.getElementById("edit-bio").value.trim();
+
+  if (!displayName || !username) {
+    alert("Display name and username are required.");
+    return;
+  }
+
+  if (!/^[a-z0-9_.]+$/.test(username)) {
+    alert("Username can only contain letters, numbers, dots and underscores.");
+    return;
+  }
+
+  const saveButton = document.getElementById("save-profile-button");
+  saveButton.disabled = true;
+
+  try {
+    await setDoc(
+      doc(db, "users", currentUser.uid),
+      {
+        displayName,
+        username,
+        bio,
+        updatedAt: serverTimestamp()
+      },
+      { merge: true }
+    );
+
+    currentProfile = {
+      ...currentProfile,
+      displayName,
+      username,
+      bio
+    };
+
+    closeEditProfile();
+
+    alert("Profile updated successfully!");
+
+    if (currentProfileId === currentUser.uid) {
+      await openProfile();
+    }
+
+  } catch (error) {
+    alert("Unable to save profile: " + error.message);
+  } finally {
+    saveButton.disabled = false;
+  }
+};
+
+// POST RENDERING
 function renderPosts() {
   feed.innerHTML = "";
 
-  latestPosts.forEach((postDoc) => {
+  latestPosts.forEach(postDoc => {
     const post = postDoc.data();
-    const postElement = document.createElement("div");
-    postElement.className = "post";
 
-    const author = document.createElement("small");
-    author.textContent = post.username
-  ? "@" + post.username
-  : (post.email || "INTERCHAT User");
-    author.style.color = "#9b7bff";
-    author.style.display = "block";
-    author.style.marginBottom = "8px";
+    const element = document.createElement("div");
+    element.className = "post";
 
+    // AUTHOR
+    const author = document.createElement("button");
+    author.className = "post-author";
+
+    author.textContent =
+      post.displayName || post.username || "INTERCHAT User";
+
+    author.addEventListener("click", () => {
+      if (post.userId) {
+        openProfile(post.userId);
+      }
+    });
+
+    // USERNAME
+    const username = document.createElement("small");
+    username.textContent =
+      post.username ? " @" + post.username : "";
+
+    username.style.color = "#888";
+
+    // CONTENT
     const content = document.createElement("p");
-    content.textContent = post.text || post.content || "";
+    content.textContent = post.text || "";
 
+    // LIKE
     const likeButton = document.createElement("button");
     likeButton.className = "like-button";
 
     const likedBy = post.likedBy || [];
-    const hasLiked = currentUser && likedBy.includes(currentUser.uid);
 
-    likeButton.textContent = hasLiked
-      ? `❤️ Liked (${likedBy.length})`
-      : `🤍 Like (${likedBy.length})`;
+    const refreshLikeButton = () => {
+      const liked = currentUser &&
+        likedBy.includes(currentUser.uid);
+
+      likeButton.textContent = liked
+        ? "❤️ Liked (" + likedBy.length + ")"
+        : "🤍 Like (" + likedBy.length + ")";
+    };
+
+    refreshLikeButton();
 
     likeButton.addEventListener("click", async () => {
-      if (!currentUser) {
-        alert("Please sign in first.");
-        return;
-      }
+      if (!currentUser) return;
 
       likeButton.disabled = true;
 
       try {
-        const postRef = doc(window.db, "posts", postDoc.id);
+        const postRef = doc(db, "posts", postDoc.id);
 
         if (likedBy.includes(currentUser.uid)) {
           await updateDoc(postRef, {
@@ -370,6 +881,7 @@ function renderPosts() {
             likedBy: arrayUnion(currentUser.uid)
           });
         }
+
       } catch (error) {
         alert(error.message);
       } finally {
@@ -377,220 +889,138 @@ function renderPosts() {
       }
     });
 
-    postElement.appendChild(author);
-    postElement.appendChild(content);
-    postElement.appendChild(likeButton);
-// COMMENTS SECTION
-const commentsSection = document.createElement("div");
-commentsSection.style.marginTop = "15px";
+    // COMMENTS
+    const commentsSection = document.createElement("div");
+    commentsSection.className = "comments";
 
-const commentsTitle = document.createElement("h4");
-commentsTitle.textContent = "Comments";
-commentsTitle.style.marginBottom = "10px";
+    const commentsTitle = document.createElement("h4");
+    commentsTitle.textContent = "Comments";
 
-const commentsList = document.createElement("div");
-commentsList.style.marginBottom = "10px";
+    const commentsList = document.createElement("div");
 
-const commentInput = document.createElement("input");
-commentInput.type = "text";
-commentInput.placeholder = "Write a comment...";
-commentInput.style.width = "75%";
-commentInput.style.padding = "10px";
-commentInput.style.borderRadius = "8px";
-commentInput.style.border = "1px solid #333";
-commentInput.style.background = "#09090f";
-commentInput.style.color = "white";
+    const commentBox = document.createElement("div");
+    commentBox.className = "comment-box";
 
-const commentButton = document.createElement("button");
-commentButton.textContent = "Send";
-commentButton.style.padding = "10px";
-commentButton.style.marginLeft = "5px";
-commentButton.style.background = "#9b7bff";
-commentButton.style.color = "white";
-commentButton.style.border = "0";
-commentButton.style.borderRadius = "8px";
+    const commentInput = document.createElement("input");
+    commentInput.placeholder = "Write a comment...";
 
-commentsSection.appendChild(commentsTitle);
-commentsSection.appendChild(commentsList);
-commentsSection.appendChild(commentInput);
-commentsSection.appendChild(commentButton);
-    // LOAD SAVED COMMENTS
-async function loadComments() {
-  try {
-    const commentsRef = collection(
-      window.db,
-      "posts",
-      postDoc.id,
-      "comments"
-    );
+    const sendButton = document.createElement("button");
+    sendButton.textContent = "Send";
 
-    const snapshot = await getDocs(commentsRef);
-    commentsList.innerHTML = "";
+    commentBox.appendChild(commentInput);
+    commentBox.appendChild(sendButton);
 
-    snapshot.forEach((commentDoc) => {
-      const comment = commentDoc.data();
+    commentsSection.appendChild(commentsTitle);
+    commentsSection.appendChild(commentsList);
+    commentsSection.appendChild(commentBox);
 
-      const commentItem = document.createElement("p");
-      commentItem.style.marginBottom = "8px";
-      commentItem.style.fontSize = "13px";
+    // LOAD COMMENTS
+    async function loadComments() {
+      try {
+        const commentsQuery = query(
+          collection(db, "posts", postDoc.id, "comments"),
+          orderBy("createdAt", "asc")
+        );
 
-      const commentAuthor = document.createElement("strong");
-      commentAuthor.textContent =
-        (comment.email || "INTERCHAT User") + ": ";
+        const snapshot = await getDocs(commentsQuery);
 
-      const commentText = document.createElement("span");
-      commentText.textContent = comment.text || "";
+        commentsList.innerHTML = "";
 
-      commentItem.appendChild(commentAuthor);
-      commentItem.appendChild(commentText);
-      commentsList.appendChild(commentItem);
+        snapshot.forEach(commentDoc => {
+          const comment = commentDoc.data();
+
+          const item = document.createElement("p");
+
+          const name = document.createElement("strong");
+          name.textContent =
+            (comment.displayName || "INTERCHAT User") + ": ";
+
+          const text = document.createElement("span");
+          text.textContent = comment.text || "";
+
+          item.appendChild(name);
+          item.appendChild(text);
+
+          commentsList.appendChild(item);
+        });
+
+      } catch (error) {
+        console.error("Comments error:", error);
+      }
+    }
+
+    loadComments();
+
+    // SEND COMMENT
+    sendButton.addEventListener("click", async () => {
+      const text = commentInput.value.trim();
+
+      if (!currentUser) {
+        alert("Please sign in first.");
+        return;
+      }
+
+      if (!text) return;
+
+      sendButton.disabled = true;
+
+      try {
+        await addDoc(
+          collection(db, "posts", postDoc.id, "comments"),
+          {
+            text,
+            userId: currentUser.uid,
+            displayName: currentProfile.displayName ||
+              currentUser.email.split("@")[0],
+            createdAt: serverTimestamp()
+          }
+        );
+
+        commentInput.value = "";
+        await loadComments();
+
+      } catch (error) {
+        alert(error.message);
+      } finally {
+        sendButton.disabled = false;
+      }
     });
-  } catch (error) {
-    console.error("Comments error:", error);
-  }
-}
 
-loadComments();
-// SAVE COMMENT
-commentButton.addEventListener("click", async () => {
-  const commentText = commentInput.value.trim();
+    element.appendChild(author);
+    element.appendChild(username);
+    element.appendChild(content);
+    element.appendChild(likeButton);
+    element.appendChild(commentsSection);
 
-  if (!currentUser) {
-    alert("Please sign in first.");
-    return;
-  }
-
-  if (!commentText) {
-    alert("Write a comment first.");
-    return;
-  }
-
-  try {
-    await addDoc(collection(window.db, "posts", postDoc.id, "comments"), {
-      text: commentText,
-      userId: currentUser.uid,
-      email: currentUser.email,
-      createdAt: serverTimestamp()
-    });
-
-    commentInput.value = "";
-    await loadComments();
-  } catch (error) {
-    alert(error.message);
-  }
-});
-postElement.appendChild(commentsSection);
-    feed.appendChild(postElement);
+    feed.appendChild(element);
   });
 }
 
-// OPEN PROFILE
-window.openProfile = async function () {
-  if (!currentUser) return;
+// HOME SHORTCUTS
+window.focusPost = function() {
+  openHome();
 
-  document.getElementById("feed-list").style.display = "none";
-  document.getElementById("post-text").style.display = "none";
-  document.getElementById("publish-post").style.display = "none";
-  document.getElementById("post-message").style.display = "none";
-  document.getElementById("profile-screen").style.display = "block";
+  document.getElementById("post-text").focus();
 
-  document.getElementById("profile-tab").classList.add("active");
-  document.getElementById("home-tab").classList.remove("active");
-
-  const profileRef = doc(window.db, "users", currentUser.uid);
-
-  try {
-    const profileSnap = await getDoc(profileRef);
-
-    if (profileSnap.exists()) {
-      const profile = profileSnap.data();
-
-      document.getElementById("profile-name").textContent =
-        profile.displayName || currentUser.email.split("@")[0];
-
-      document.getElementById("profile-username").textContent =
-        "@" + (profile.username || currentUser.email.split("@")[0]);
-
-      document.getElementById("profile-bio").textContent =
-        profile.bio || "No bio yet.";
-    }
-
-    const myPosts = latestPosts.filter(
-      post => post.data().userId === currentUser.uid
-    );
-
-    const profilePosts = document.getElementById("profile-posts");
-    profilePosts.innerHTML = "";
-
-    myPosts.forEach(postDoc => {
-      const post = postDoc.data();
-
-      const postElement = document.createElement("div");
-      postElement.className = "post";
-
-      const content = document.createElement("p");
-      content.textContent = post.text || post.content || "";
-
-      postElement.appendChild(content);
-      profilePosts.appendChild(postElement);
-    });
-
-  } catch (error) {
-    console.error("Profile error:", error);
-  }
-};
-// EDIT PROFILE
-window.editProfile = async function () {
-  if (!currentUser) {
-    alert("Please sign in first.");
-    return;
-  }
-
-  const newName = prompt("Enter your display name:");
-  if (newName === null || !newName.trim()) return;
-
-  const newUsername = prompt("Enter your username:");
-  if (newUsername === null || !newUsername.trim()) return;
-
-  const newBio = prompt("Enter your bio:");
-  if (newBio === null) return;
-
-  try {
-    await setDoc(
-      doc(window.db, "users", currentUser.uid),
-      {
-        displayName: newName.trim(),
-        username: newUsername.trim().replace("@", ""),
-        bio: newBio.trim()
-      },
-      { merge: true }
-    );
-
-    document.getElementById("profile-name").textContent = newName.trim();
-    document.getElementById("profile-username").textContent =
-      "@" + newUsername.trim().replace("@", "");
-    document.getElementById("profile-bio").textContent =
-      newBio.trim() || "No bio yet.";
-
-    alert("Profile updated successfully!");
-  } catch (error) {
-  newUsernameofile update failed: " + error.message);
-  }
-};
-// OPEN HOME
-window.openHome = function () {
-  document.getElementById("home-tab").classList.add("active");
-  document.getElementById("profile-tab").classList.remove("active");
-
-  document.getElementById("profile-screen").style.display = "none";
-  document.getElementById("feed-list").style.display = "block";
-  document.getElementById("post-text").style.display = "block";
-  document.getElementById("publish-post").style.display = "block";
-  document.getElementById("post-message").style.display = "block";
+  window.scrollTo({
+    top: 250,
+    behavior: "smooth"
+  });
 };
 
-// WATCH LOGIN STATUS
-onAuthStateChanged(window.auth, (user) => {
+window.openExplore = function() {
+  openHome();
+  document.getElementById("feed-list").scrollIntoView({
+    behavior: "smooth"
+  });
+};
+
+window.showComingSoon = function(feature) {
+  alert(feature + " is coming soon!");
+};
+
+// AUTH STATE
+onAuthStateChanged(auth, async user => {
   currentUser = user;
 
   document.getElementById("auth-section").style.display =
@@ -599,58 +1029,79 @@ onAuthStateChanged(window.auth, (user) => {
   document.getElementById("app-screen").style.display =
     user ? "block" : "none";
 
+  if (user) {
+    try {
+      currentProfile = await getUserProfile(user.uid);
+    } catch (error) {
+      console.error("Profile loading error:", error);
+      currentProfile = {};
+    }
+
+    openHome();
+  } else {
+    currentProfile = {};
+    latestPosts = [];
+    feed.innerHTML = "";
+  }
+
   renderPosts();
 });
 
 // CREATE ACCOUNT
 document.getElementById("signup").addEventListener("click", async () => {
-  const email = emailInput.value.trim();
-  const password = passwordInput.value;
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
+
+  if (!email || !password) {
+    authMessage.textContent = "Enter your email and password.";
+    return;
+  }
 
   try {
     const result = await createUserWithEmailAndPassword(
-      window.auth,
+      auth,
       email,
       password
     );
 
-    await setDoc(doc(window.db, "users", result.user.uid), {
-      email: result.user.email,
-      username: email.split("@")[0].toLowerCase(), displayName: email.split("@")[0], bio: "", profilePicture: "",
+    const username = email.split("@")[0].toLowerCase();
+
+    await setDoc(doc(db, "users", result.user.uid), {
+      email,
+      displayName: username,
+      username,
+      bio: "",
       createdAt: serverTimestamp()
     });
 
-    message.textContent = "Account created successfully!";
+    authMessage.textContent = "Account created successfully!";
+
   } catch (error) {
-    message.textContent = error.message;
+    authMessage.textContent = error.message;
   }
 });
 
 // SIGN IN
 document.getElementById("login").addEventListener("click", async () => {
-  try {
-    await signInWithEmailAndPassword(
-      window.auth,
-      emailInput.value.trim(),
-      passwordInput.value
-    );
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
 
-    message.textContent = "Welcome back to INTERCHAT!";
+  if (!email || !password) {
+    authMessage.textContent = "Enter your email and password.";
+    return;
+  }
+
+  try {
+    await signInWithEmailAndPassword(auth, email, password);
+
+    authMessage.textContent = "Welcome back to INTERCHAT!";
+
   } catch (error) {
-    message.textContent = error.message;
+    authMessage.textContent = error.message;
   }
 });
 
-// SIGN OUT
-document.getElementById("logout").addEventListener("click", async () => {
-  try {
-    await signOut(window.auth);
-  } catch (error) {
-    alert(error.message);
-  }
-});
-
-// PUBLISH TEXT POST
+// PUBLISH POST
 document.getElementById("publish-post").addEventListener("click", async () => {
   const text = postText.value.trim();
 
@@ -664,36 +1115,51 @@ document.getElementById("publish-post").addEventListener("click", async () => {
     return;
   }
 
+  const button = document.getElementById("publish-post");
+  button.disabled = true;
+
   try {
-    await addDoc(collection(window.db, "posts"), {
-      text: text,
+    await addDoc(collection(db, "posts"), {
+      text,
       userId: currentUser.uid,
       email: currentUser.email,
-      username: currentUser.email.split("@")[0].toLowerCase(),
+      displayName: currentProfile.displayName ||
+        currentUser.email.split("@")[0],
+      username: currentProfile.username ||
+        currentUser.email.split("@")[0].toLowerCase(),
       createdAt: serverTimestamp(),
       likedBy: []
     });
 
     postText.value = "";
     postMessage.textContent = "Your post has been published!";
+
   } catch (error) {
     postMessage.textContent = error.message;
+  } finally {
+    button.disabled = false;
   }
 });
 
-// LIVE FEED - NEWEST POSTS FIRST
+// LIVE FEED
 const postsQuery = query(
-  collection(window.db, "posts"),
+  collection(db, "posts"),
   orderBy("createdAt", "desc")
 );
 
-onSnapshot(postsQuery, (snapshot) => {
+onSnapshot(postsQuery, snapshot => {
   latestPosts = snapshot.docs;
   renderPosts();
-}, (error) => {
+
+}, error => {
   console.error("Feed error:", error);
-  postMessage.textContent = "Unable to load posts: " + error.message;
+
+  postMessage.textContent =
+    "Unable to load posts: " + error.message;
 });
+
+console.log("INTERCHAT is ready!");
+
 </script>
 
 </body>
