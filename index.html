@@ -1,4 +1,5 @@
-margin-toppublish-publish-postublish-post<!DOCTYPE html>
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -176,7 +177,8 @@ button {
   style="width:100%;padding:12px;background:#09090f;color:white;border:1px solid #333;border-radius:10px;min-height:90px;">
 </textarea>
 
-<button id="publishmargin-toptyle="width:100%;padding:12px;margin-top:10px;background:#9b7bff;color:white;border:0;border-radius:10px;">
+<button id="publish-post"
+  style="width:100%;padding:12px;margin-top:10px;background:#9b7bff;color:white;border:0;border-radius:10px;">
   Publish
 </button>
 
@@ -189,17 +191,41 @@ button {
 </div>
 
 <!-- LIVE FEED -->
-<div id="feed-list"></div>s="active">⌂ Home</span>
+<div id="feed-list"></div>
+<!-- PROFILE SCREEN -->
+  <button onclick="openHome()" style="margin:15px;padding:10px 18px;background:#252535;color:white;border:0;border-radius:10px;">
+  ← Home
+  </button>
+<div id="profile-screen" style="display:none;">
+
+  <div style="text-align:center;padding:25px 15px;">
+    <div id="profile-avatar" style="width:90px;height:90px;border-radius:50%;background:#252535;margin:auto;display:flex;align-items:center;justify-content:center;font-size:35px;">
+      👤
+    </div>
+
+    <h2 id="profile-name" style="margin-top:15px;">My Profile</h2>
+
+    <p id="profile-username" style="color:#aaa;margin-top:5px;">@username</p>
+
+    <p id="profile-bio" style="margin-top:12px;color:#ccc;">No bio yet.</p>
+
+    <button onclick="editProfile()" style="margin-top:15px;background:#252535;color:white;border:none;padding:10px 20px;border-radius:20px;">
+      Edit Profile
+    </button>
+  </div>
+
+  <h3 style="padding:15px;">My Posts</h3>
+  <div id="profile-posts"></div>
+
+</div>
+<!-- NAVIGATION -->
+<nav>
+  <span id="home-tab" class="active" onclick="openHome()">⌂ Home</span>
   <span>🔍 Explore</span>
   <span>＋ Post</span>
   <span>💬 Chats</span>
-  <span onclick="openProfile()">👤 Profile</span>
+  <span id="profile-tab" onclick="openProfile()">👤 Profile</span>
 </nav>
-
-</div>
-
-<!-- AUTHENTICATION -->
-<div i
 
 </div>
 
@@ -269,6 +295,7 @@ import {
 
 import {
   doc,
+  getDoc,
   setDoc,
   serverTimestamp,
   collection,
@@ -308,7 +335,9 @@ function renderPosts() {
   : (post.email || "INTERCHAT User");
     author.style.color = "#9b7bff";
     author.style.display = "block";
-    author.style.marginBottom = "8script    const content = document.createElement("p");
+    author.style.marginBottom = "8px";
+
+    const content = document.createElement("p");
     content.textContent = post.text || post.content || "";
 
     const likeButton = document.createElement("button");
@@ -455,6 +484,74 @@ postElement.appendChild(commentsSection);
   });
 }
 
+// OPEN PROFILE
+window.openProfile = async function () {
+  if (!currentUser) return;
+
+  document.getElementById("feed-list").style.display = "none";
+  document.getElementById("post-text").style.display = "none";
+  document.getElementById("publish-post").style.display = "none";
+  document.getElementById("post-message").style.display = "none";
+  document.getElementById("profile-screen").style.display = "block";
+
+  document.getElementById("profile-tab").classList.add("active");
+  document.getElementById("home-tab").classList.remove("active");
+
+  const profileRef = doc(window.db, "users", currentUser.uid);
+
+  try {
+    const profileSnap = await getDoc(profileRef);
+
+    if (profileSnap.exists()) {
+      const profile = profileSnap.data();
+
+      document.getElementById("profile-name").textContent =
+        profile.displayName || currentUser.email.split("@")[0];
+
+      document.getElementById("profile-username").textContent =
+        "@" + (profile.username || currentUser.email.split("@")[0]);
+
+      document.getElementById("profile-bio").textContent =
+        profile.bio || "No bio yet.";
+    }
+
+    const myPosts = latestPosts.filter(
+      post => post.data().userId === currentUser.uid
+    );
+
+    const profilePosts = document.getElementById("profile-posts");
+    profilePosts.innerHTML = "";
+
+    myPosts.forEach(postDoc => {
+      const post = postDoc.data();
+
+      const postElement = document.createElement("div");
+      postElement.className = "post";
+
+      const content = document.createElement("p");
+      content.textContent = post.text || post.content || "";
+
+      postElement.appendChild(content);
+      profilePosts.appendChild(postElement);
+    });
+
+  } catch (error) {
+    console.error("Profile error:", error);
+  }
+};
+
+// OPEN HOME
+window.openHome = function () {
+  document.getElementById("home-tab").classList.add("active");
+  document.getElementById("profile-tab").classList.remove("active");
+
+  document.getElementById("profile-screen").style.display = "none";
+  document.getElementById("feed-list").style.display = "block";
+  document.getElementById("post-text").style.display = "block";
+  document.getElementById("publish-post").style.display = "block";
+  document.getElementById("post-message").style.display = "block";
+};
+
 // WATCH LOGIN STATUS
 onAuthStateChanged(window.auth, (user) => {
   currentUser = user;
@@ -480,14 +577,11 @@ document.getElementById("signup").addEventListener("click", async () => {
       password
     );
 
-   await setDoc(doc(window.db, "users", result.user.uid), {
-  email: result.user.email,
-  username: email.split("@")[0].toLowerCase(),
-  displayName: email.split("@")[0],
-  bio: "",
-  profilePicture: "",
-  createdAt: serverTimestamp()
-});
+    await setDoc(doc(window.db, "users", result.user.uid), {
+      email: result.user.email,
+      username: email.split("@")[0].toLowerCase(), displayName: email.split("@")[0], bio: "", profilePicture: "",
+      createdAt: serverTimestamp()
+    });
 
     message.textContent = "Account created successfully!";
   } catch (error) {
@@ -563,20 +657,6 @@ onSnapshot(postsQuery, (snapshot) => {
   console.error("Feed error:", error);
   postMessage.textContent = "Unable to load posts: " + error.message;
 });
-  <!-- PROFILE SCREEN -->
-<div id="profileScreen" style="display:none; padding:20px;">
-  <div style="text-align:center;">
-    <div id="profileAvatar" style="font-size:70px;">👤</div>
-    <h2 id="profileName">My Profile</h2>
-    <p id="profileUsername">@username</p>
-    <p id="profileBio">No bio yet.</p>
-  </div>
-
-  <div style="margin-top:25px; border-top:1px solid #333; padding-top:15px;">
-    <h3>My Posts</h3>
-    <div id="profilePosts"></div>
-  </div>
-</div>
 </script>
 
 </body>
