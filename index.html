@@ -24,7 +24,14 @@ import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/fireba
 import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, updateProfile } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
 import { getFirestore, collection, doc, getDoc, setDoc, updateDoc, addDoc, deleteDoc, query, orderBy, limit, where, getDocs, onSnapshot, serverTimestamp, arrayUnion, arrayRemove } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 // Replace these values with your Firebase project's web app config (Firebase Console > Project settings > Your apps).
-const firebaseConfig = {apiKey:"YOUR_API_KEY",authDomain:"YOUR_PROJECT_ID.firebaseapp.com",projectId:"YOUR_PROJECT_ID",storageBucket:"YOUR_PROJECT_ID.appspot.com",messagingSenderId:"YOUR_MESSAGING_SENDER_ID",appId:"YOUR_APP_ID"};
+const firebaseConfig = {
+  apiKey: "AIzaSyDjKlQjHuzQgDIqOH_0fLJuqfL9701cJc",
+  authDomain: "interchat-c1cfc.firebaseapp.com",
+  projectId: "interchat-c1cfc",
+  storageBucket: "interchat-c1cfc.firebasestorage.app",
+  messagingSenderId: "583165274280",
+  appId: "1:583165274280:web:cab44e35230adc157a7a9d"
+};
 const app=initializeApp(firebaseConfig), auth=getAuth(app), db=getFirestore(app);
 const $=s=>document.querySelector(s), main=$('#main'); let user=null, page='home', signup=false, feedUnsub=null, chatUnsub=null, activeChat=null, viewedUser=null, currentProfile=null, savedIds=[];
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
